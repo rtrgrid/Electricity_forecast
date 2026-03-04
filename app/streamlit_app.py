@@ -20,6 +20,11 @@ from src.transformer_model import TransformerModel
 @st.cache_data(show_spinner=False)
 def train_dl_models(X_train_np, y_train_np, X_test_np, y_test_np, _scaler, epochs, horizon, batch_size, input_size):
 
+    os.makedirs("models", exist_ok=True)
+
+    lstm_path = f"models/lstm_{epochs}_{horizon}.pth"
+    transformer_path = f"models/transformer_{epochs}_{horizon}.pth"
+
     device = torch.device("cpu")
 
     X_train = torch.tensor(X_train_np, dtype=torch.float32)
@@ -32,41 +37,60 @@ def train_dl_models(X_train_np, y_train_np, X_test_np, y_test_np, _scaler, epoch
 
     loss_fn = torch.nn.MSELoss()
 
+    # =========================
     # LSTM
+    # =========================
     lstm_model = LSTMModel(
         input_size=input_size,
         hidden_size=64,
         horizon=horizon
     )
 
-    optimizer = torch.optim.Adam(lstm_model.parameters(), lr=1e-3)
+    if os.path.exists(lstm_path):
 
-    for _ in range(epochs):
-        lstm_model.train()
-        for xb, yb in train_loader:
-            optimizer.zero_grad()
-            preds = lstm_model(xb)
-            loss = loss_fn(preds, yb)
-            loss.backward()
-            optimizer.step()
+        lstm_model.load_state_dict(torch.load(lstm_path, map_location="cpu"))
+
+    else:
+
+        optimizer = torch.optim.Adam(lstm_model.parameters(), lr=1e-3)
+
+        for _ in range(epochs):
+            lstm_model.train()
+            for xb, yb in train_loader:
+                optimizer.zero_grad()
+                preds = lstm_model(xb)
+                loss = loss_fn(preds, yb)
+                loss.backward()
+                optimizer.step()
+
+        torch.save(lstm_model.state_dict(), lstm_path)
 
     lstm_model.eval()
     with torch.no_grad():
         lstm_preds = lstm_model(X_test)
 
+    lstm_preds = lstm_preds.numpy()
+
+    # =========================
+    # TRUE VALUES
+    # =========================
+    y_true = y_test.numpy()
+
     lstm_preds = _scaler.inverse_transform(
-        lstm_preds.numpy().reshape(-1,1)
+        lstm_preds.reshape(-1,1)
     ).reshape(lstm_preds.shape)
 
     y_true = _scaler.inverse_transform(
-        y_test.numpy().reshape(-1,1)
-    ).reshape(y_test.shape)
+        y_true.reshape(-1,1)
+    ).reshape(y_true.shape)
 
     lstm_rmse = np.sqrt(
         mean_squared_error(y_true.flatten(), lstm_preds.flatten())
     )
 
-    # Transformer
+    # =========================
+    # TRANSFORMER
+    # =========================
     transformer_model = TransformerModel(
         input_size=input_size,
         d_model=64,
@@ -75,23 +99,33 @@ def train_dl_models(X_train_np, y_train_np, X_test_np, y_test_np, _scaler, epoch
         horizon=horizon
     )
 
-    optimizer = torch.optim.Adam(transformer_model.parameters(), lr=5e-4)
+    if os.path.exists(transformer_path):
 
-    for _ in range(epochs):
-        transformer_model.train()
-        for xb, yb in train_loader:
-            optimizer.zero_grad()
-            preds = transformer_model(xb)
-            loss = loss_fn(preds, yb)
-            loss.backward()
-            optimizer.step()
+        transformer_model.load_state_dict(torch.load(transformer_path, map_location="cpu"))
+
+    else:
+
+        optimizer = torch.optim.Adam(transformer_model.parameters(), lr=5e-4)
+
+        for _ in range(epochs):
+            transformer_model.train()
+            for xb, yb in train_loader:
+                optimizer.zero_grad()
+                preds = transformer_model(xb)
+                loss = loss_fn(preds, yb)
+                loss.backward()
+                optimizer.step()
+
+        torch.save(transformer_model.state_dict(), transformer_path)
 
     transformer_model.eval()
     with torch.no_grad():
         transformer_preds = transformer_model(X_test)
 
+    transformer_preds = transformer_preds.numpy()
+
     transformer_preds = _scaler.inverse_transform(
-        transformer_preds.numpy().reshape(-1,1)
+        transformer_preds.reshape(-1,1)
     ).reshape(transformer_preds.shape)
 
     transformer_rmse = np.sqrt(
@@ -99,7 +133,6 @@ def train_dl_models(X_train_np, y_train_np, X_test_np, y_test_np, _scaler, epoch
     )
 
     return lstm_preds, transformer_preds, lstm_rmse, transformer_rmse, y_true
-
 
 st.set_page_config(layout="wide")
 st.title("⚡ Electricity Forecasting Research Dashboard")
@@ -353,6 +386,7 @@ idx = st.slider("Backtest Window", 0, max_windows - 1, 0)
 dates = df.index[-len(test):][idx:idx+horizon]
 
 fig, ax = plt.subplots(figsize=(9,4))
+
 ax.plot(dates, y_true_naive[idx], label="Actual", linewidth=2)
 
 if "ARIMA" in selected_models:
@@ -371,8 +405,14 @@ if "Transformer" in selected_models:
         upper = transformer_preds[idx] + 1.96 * std
         ax.fill_between(dates, lower, upper, alpha=0.2)
 
+# ADD THESE
+ax.set_xlabel("Time")
+ax.set_ylabel("Electricity Production")
+ax.set_title("Forecast vs Actual")
+
 ax.legend()
 ax.grid(True)
+
 st.pyplot(fig)
 
 # =========================
@@ -402,10 +442,18 @@ if "Transformer" in selected_models and transformer_rmse is not None:
     residuals = y_true.flatten() - transformer_preds.flatten()
 
     fig_res, ax_res = plt.subplots(figsize=(9,3))
+
     ax_res.plot(residuals)
+
+    # ADD THESE
+    ax_res.set_xlabel("Prediction Index")
+    ax_res.set_ylabel("Residual Error")
+    ax_res.set_title("Transformer Residual Error")
+
     ax_res.axhline(0, linestyle="--")
     ax_res.grid(True)
-    st.pyplot(fig_res)
+
+st.pyplot(fig_res)
 
 # =========================
 # DOWNLOAD RESULTS
