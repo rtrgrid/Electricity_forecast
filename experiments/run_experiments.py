@@ -117,7 +117,7 @@ for context in contexts:
                     epoch_loss += loss.item()
 
                 if (epoch + 1) % 10 == 0:
-                    print(f"Epoch {epoch+1}/{epochs} Loss {epoch_loss/len(train_loader):.4f}")
+                    print(f"Epoch {epoch+1}/{epoch} Loss {epoch_loss/len(train_loader):.4f}")
 
             # =========================
             # PREDICTION
@@ -193,4 +193,4 @@ results_df.to_csv(
 print("\n===============================")
 print("Experiments completed.")
 print("Total experiments:", len(results_df))
-print("===============================")
+print("=================================")
