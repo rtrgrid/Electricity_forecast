@@ -17,6 +17,90 @@ from src.arima_model import run_arima
 from src.lstm_model import LSTMModel
 from src.transformer_model import TransformerModel
 
+@st.cache_data(show_spinner=False)
+def train_dl_models(X_train_np, y_train_np, X_test_np, y_test_np, _scaler, epochs, horizon, batch_size, input_size):
+
+    device = torch.device("cpu")
+
+    X_train = torch.tensor(X_train_np, dtype=torch.float32)
+    y_train = torch.tensor(y_train_np, dtype=torch.float32)
+    X_test = torch.tensor(X_test_np, dtype=torch.float32)
+    y_test = torch.tensor(y_test_np, dtype=torch.float32)
+
+    train_dataset = TensorDataset(X_train, y_train)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+    loss_fn = torch.nn.MSELoss()
+
+    # LSTM
+    lstm_model = LSTMModel(
+        input_size=input_size,
+        hidden_size=64,
+        horizon=horizon
+    )
+
+    optimizer = torch.optim.Adam(lstm_model.parameters(), lr=1e-3)
+
+    for _ in range(epochs):
+        lstm_model.train()
+        for xb, yb in train_loader:
+            optimizer.zero_grad()
+            preds = lstm_model(xb)
+            loss = loss_fn(preds, yb)
+            loss.backward()
+            optimizer.step()
+
+    lstm_model.eval()
+    with torch.no_grad():
+        lstm_preds = lstm_model(X_test)
+
+    lstm_preds = _scaler.inverse_transform(
+        lstm_preds.numpy().reshape(-1,1)
+    ).reshape(lstm_preds.shape)
+
+    y_true = _scaler.inverse_transform(
+        y_test.numpy().reshape(-1,1)
+    ).reshape(y_test.shape)
+
+    lstm_rmse = np.sqrt(
+        mean_squared_error(y_true.flatten(), lstm_preds.flatten())
+    )
+
+    # Transformer
+    transformer_model = TransformerModel(
+        input_size=input_size,
+        d_model=64,
+        nhead=4,
+        num_layers=2,
+        horizon=horizon
+    )
+
+    optimizer = torch.optim.Adam(transformer_model.parameters(), lr=5e-4)
+
+    for _ in range(epochs):
+        transformer_model.train()
+        for xb, yb in train_loader:
+            optimizer.zero_grad()
+            preds = transformer_model(xb)
+            loss = loss_fn(preds, yb)
+            loss.backward()
+            optimizer.step()
+
+    transformer_model.eval()
+    with torch.no_grad():
+        transformer_preds = transformer_model(X_test)
+
+    transformer_preds = _scaler.inverse_transform(
+        transformer_preds.numpy().reshape(-1,1)
+    ).reshape(transformer_preds.shape)
+
+    transformer_rmse = np.sqrt(
+        mean_squared_error(y_true.flatten(), transformer_preds.flatten())
+    )
+
+    return lstm_preds, transformer_preds, lstm_rmse, transformer_rmse, y_true
+
+
 st.set_page_config(layout="wide")
 st.title("⚡ Electricity Forecasting Research Dashboard")
 
@@ -121,78 +205,28 @@ transformer_rmse = None
 # =========================
 with st.spinner("Training selected models..."):
 
-    # LSTM
-    if "LSTM" in selected_models:
-        lstm_model = LSTMModel(
-            input_size=X_train.shape[-1],
-            hidden_size=64,
-            horizon=horizon
-        ).to(device)
+    lstm_preds = None
+    transformer_preds = None
 
-        optimizer = torch.optim.Adam(lstm_model.parameters(), lr=1e-3)
+    if "LSTM" in selected_models or "Transformer" in selected_models:
 
-        for _ in range(epochs):
-            lstm_model.train()
-            for xb, yb in train_loader:
-                optimizer.zero_grad()
-                preds = lstm_model(xb)
-                loss = loss_fn(preds, yb)
-                loss.backward()
-                optimizer.step()
-
-        lstm_model.eval()
-        with torch.no_grad():
-            lstm_preds = lstm_model(X_test)
-
-        lstm_preds = scaler.inverse_transform(
-            lstm_preds.cpu().numpy().reshape(-1,1)
-        ).reshape(lstm_preds.shape)
-
-        y_true = scaler.inverse_transform(
-            y_test.cpu().numpy().reshape(-1,1)
-        ).reshape(y_test.shape)
-
-        lstm_rmse = np.sqrt(
-            mean_squared_error(y_true.flatten(), lstm_preds.flatten())
+        lstm_preds, transformer_preds, lstm_rmse, transformer_rmse, y_true = train_dl_models(
+            X_train.cpu().numpy(),
+            y_train.cpu().numpy(),
+            X_test.cpu().numpy(),
+            y_test.cpu().numpy(),
+            scaler,
+            epochs,
+            horizon,
+            batch_size,
+            X_train.shape[-1]
         )
 
-    # Transformer
-    if "Transformer" in selected_models:
-        transformer_model = TransformerModel(
-            input_size=X_train.shape[-1],
-            d_model=64,
-            nhead=4,
-            num_layers=2,
-            horizon=horizon
-        ).to(device)
+    if "LSTM" not in selected_models:
+        lstm_rmse = None
 
-        optimizer = torch.optim.Adam(transformer_model.parameters(), lr=5e-4)
-
-        for _ in range(epochs):
-            transformer_model.train()
-            for xb, yb in train_loader:
-                optimizer.zero_grad()
-                preds = transformer_model(xb)
-                loss = loss_fn(preds, yb)
-                loss.backward()
-                optimizer.step()
-
-        transformer_model.eval()
-        with torch.no_grad():
-            transformer_preds = transformer_model(X_test)
-
-        transformer_preds = scaler.inverse_transform(
-            transformer_preds.cpu().numpy().reshape(-1,1)
-        ).reshape(transformer_preds.shape)
-
-        y_true = scaler.inverse_transform(
-            y_test.cpu().numpy().reshape(-1,1)
-        ).reshape(y_test.shape)
-
-        transformer_rmse = np.sqrt(
-            mean_squared_error(y_true.flatten(), transformer_preds.flatten())
-        )
-
+    if "Transformer" not in selected_models:
+        transformer_rmse = None
 # =========================
 # METRICS DISPLAY
 # =========================

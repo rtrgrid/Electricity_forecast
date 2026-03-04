@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from torch.utils.data import DataLoader, TensorDataset
@@ -61,6 +62,10 @@ def main():
     )
 
     print("Naive RMSE:", naive_rmse)
+    np.save("outputs/naive_preds.npy", naive_preds)
+    np.save("outputs/y_true_naive.npy", y_true_naive)
+
+    print("Naive predictions saved to outputs/")
 
     # =========================
     # ARIMA
@@ -78,6 +83,10 @@ def main():
     )
 
     print("ARIMA RMSE:", arima_rmse)
+    np.save("outputs/arima_preds.npy", arima_preds)
+    np.save("outputs/y_true_arima.npy", y_true_arima)
+
+    print("ARIMA predictions saved to outputs/")
 
     # =========================
     # SCALE DATA
@@ -210,6 +219,17 @@ def main():
     print("Transformer RMSE:", transformer_rmse)
     torch.save(transformer_model.state_dict(), "models/transformer_model.pth")
     print("Transformer model saved to models/transformer_model.pth")
+
+    config = {
+        "context_length": context,
+        "horizon": horizon,
+        "epochs": epochs,
+        "batch_size": batch_size
+    }
+
+    pd.DataFrame([config]).to_csv("outputs/training_config.csv", index=False)
+
+    print("Training config saved to outputs/training_config.csv")
     # =========================
     # FINAL RESULTS
     # =========================
@@ -220,7 +240,7 @@ def main():
     print(f"Transformer RMSE  : {transformer_rmse:.4f}")
     print("===================================")
 
-    import pandas as pd
+    
 
     results = {
         "Model": ["Naive", "ARIMA", "LSTM", "Transformer"],
@@ -248,6 +268,11 @@ def main():
     plt.savefig("plots/rmse_comparison.png")
 
     print("Plot saved to plots/rmse_comparison.png")
+
+    # import torch
+
+    # torch.save(lstm_model.state_dict(), "models/lstm_model.pth")
+    # torch.save(transformer_model.state_dict(), "models/transformer_model.pth")
 
 if __name__ == "__main__":
     main()
