@@ -1,14 +1,14 @@
-⚡ Electricity Forecasting using ARIMA, LSTM and Transformer
+⚡ Electricity Forecasting using ARIMA, LSTM, and Transformer
 
 An end-to-end time-series forecasting project that predicts electricity production using classical statistical models and modern deep learning architectures.
 
-The project compares multiple forecasting approaches and demonstrates how Transformer models outperform traditional methods for sequential data prediction.
+The project compares multiple forecasting approaches and demonstrates how Transformer models can outperform traditional models for sequential data prediction.
 
-🌐 Live Dashboard
+🌐 Live Demo
 
 You can explore the interactive forecasting dashboard here:
 
-👉 Streamlit App
+Streamlit App
 https://electricityforecast-cwdb6vgjhljudsnxn5z9kn.streamlit.app/
 
 The dashboard allows users to:
@@ -27,15 +27,15 @@ Understand model performance
 
 Electricity production forecasting is an important time-series prediction problem used in:
 
-energy grid management
+Energy grid management
 
-demand forecasting
+Demand forecasting
 
-infrastructure planning
+Infrastructure planning
 
-resource allocation
+Resource allocation
 
-In this project we compare four approaches:
+This project compares four forecasting approaches:
 
 Model	Type
 Naive Baseline	Simple heuristic
@@ -43,192 +43,195 @@ ARIMA	Statistical time-series model
 LSTM	Recurrent neural network
 Transformer	Attention-based deep learning model
 
-The goal is to evaluate which architecture best captures temporal patterns in electricity production data.
+The objective is to evaluate which architecture best captures temporal patterns in electricity production data.
 
 📁 Dataset
 
-Dataset used:
+Dataset used: Electric Production Dataset
 
-Electric Production Dataset
-
-Contains monthly electricity production values.
-
-Columns:
+The dataset contains monthly electricity production values.
 
 Column	Description
-Date	timestamp
-Value	electricity production index
+Date	Timestamp
+Value	Electricity production index
 
 Dataset size:
 
 397 time steps
 
-The dataset contains clear trend and seasonal patterns, making it ideal for forecasting experiments.
+The data contains clear trend and seasonal patterns, making it suitable for time-series forecasting experiments.
 
 🧠 Models Implemented
-1️⃣ Naive Baseline
+1. Naive Baseline
 
-The Naive model simply predicts:
+The Naive model predicts the future value using the last observed value.
 
-future value = last observed value
+Prediction = Last Observed Value
 
-This serves as a baseline benchmark.
+Purpose:
 
-It helps evaluate whether more complex models actually learn meaningful patterns.
+Establishes a baseline performance
 
-2️⃣ ARIMA Model
+Helps determine if complex models actually improve predictions
+
+2. ARIMA Model
 
 ARIMA stands for:
 
 AutoRegressive Integrated Moving Average
 
-It models time series as a combination of:
+It models time series using three components:
 
-autoregression
+AR (AutoRegressive) → relationship with past values
 
-differencing
+I (Integrated) → differencing to remove trends
 
-moving average
-
-General form:
-
-y(t) = c + Σ φi y(t-i) + Σ θj ε(t-j)
-
-Strengths:
-
-interpretable
-
-good for small datasets
-
-captures linear trends
-
-Limitations:
-
-struggles with nonlinear patterns
-
-3️⃣ LSTM Model
-
-LSTM (Long Short-Term Memory) is a type of Recurrent Neural Network (RNN) designed for sequence learning.
-
-It uses three gates:
-
-Forget gate
-
-Input gate
-
-Output gate
-
-These gates allow the network to maintain long-term memory of past time steps.
+MA (Moving Average) → relationship with past errors
 
 Advantages:
 
-captures nonlinear temporal relationships
+Works well on small datasets
 
-learns complex sequence patterns
+Interpretable statistical model
+
+Captures linear time patterns
 
 Limitations:
 
-sequential computation
+Cannot easily model nonlinear patterns
 
-slower training
+3. LSTM Model
 
-struggles with very long context windows
+LSTM (Long Short-Term Memory) is a Recurrent Neural Network designed for sequential data.
 
-4️⃣ Transformer Model
+It contains three main gates:
+
+Forget Gate
+
+Input Gate
+
+Output Gate
+
+These gates allow the network to:
+
+remember important past information
+
+forget irrelevant information
+
+maintain long-term dependencies
+
+Advantages:
+
+Learns nonlinear relationships
+
+Good for sequential data
+
+Handles longer dependencies than basic RNNs
+
+Limitations:
+
+Sequential computation slows training
+
+Performance may degrade with very long sequences
+
+4. Transformer Model
 
 Transformers use self-attention mechanisms to model relationships between time steps.
 
-Instead of processing sequences step-by-step like RNNs, transformers compute attention across the entire sequence.
-
-Attention mechanism:
-
-Attention(Q,K,V) = softmax(QKᵀ / √d) V
+Instead of processing sequences sequentially like RNNs, transformers evaluate relationships between all time steps simultaneously.
 
 Advantages:
 
-captures global temporal dependencies
+Captures global temporal dependencies
 
-parallel computation
+Highly parallelizable
 
-strong representation learning
+Strong performance on sequential data
 
-This architecture is widely used in:
+Transformers are widely used in:
 
-NLP (GPT, BERT)
+GPT models
 
-computer vision
+BERT
 
-time-series forecasting
+Vision Transformers
 
-⚙️ Forecasting Method
+Time-series forecasting
 
-The project uses sliding window forecasting.
+⚙️ Forecasting Approach
 
-Example:
+The project uses a sliding window forecasting method.
+
+Example configuration:
 
 Context Length = 24
 Prediction Horizon = 12
 
 Meaning:
 
-Use past 24 time steps
-→ predict next 12 time steps
+Past 24 time steps → used to predict next 12 time steps
 
-Window creation pipeline:
+Pipeline:
 
-Time series
-    ↓
-Sliding window
-    ↓
-Training sequences
-    ↓
-Model prediction
+Time Series
+      ↓
+Sliding Window Creation
+      ↓
+Train/Test Split
+      ↓
+Model Training
+      ↓
+Prediction
+      ↓
+Evaluation
 📈 Evaluation Metric
 
-We evaluate models using RMSE (Root Mean Square Error).
+The models are evaluated using RMSE (Root Mean Square Error).
 
-RMSE measures the average prediction error magnitude.
+Formula:
+
+RMSE = sqrt( (1/n) * Σ(actual − predicted)² )
 
 Interpretation:
 
 RMSE	Meaning
-high	poor predictions
-low	accurate predictions
+High RMSE	Poor predictions
+Low RMSE	Accurate predictions
 
-Lower RMSE indicates better forecasting performance.
+Lower RMSE indicates better forecasting accuracy.
 
 🧪 Experiment Configuration
 
-Experiments were run with multiple hyperparameters.
+Multiple experiments were conducted with different hyperparameters.
 
 Parameters explored:
 
-Context length: 12 → 72
-Prediction horizon: 6 → 24
-Transformer model dimension: 32, 64, 128
-Training epochs: 30 → 100
-Batch size: 32
+Context Length: 12 → 72
+Prediction Horizon: 6 → 24
+Transformer Dimension: 32, 64, 128
+Epochs: 30 → 100
+Batch Size: 32
 
 Experiments were automated using:
 
 experiments/run_experiments.py
 
-Each experiment saves:
+Each experiment stores:
 
 predictions
 
-visualizations
+RMSE results
 
-RMSE scores
+visualization plots
 
 📊 Final Model Performance
 
 Best experiment configuration:
 
-Context length: 24
-Prediction horizon: 12
+Context Length: 24
+Prediction Horizon: 12
 Epochs: 50
-Batch size: 32
+Batch Size: 32
 
 Results:
 
@@ -239,31 +242,31 @@ LSTM	4.15
 Transformer	3.81
 🏆 Key Result
 
-The Transformer model achieved the best forecasting accuracy.
+The Transformer model achieved the lowest RMSE, making it the best performing model.
 
-Improvement compared to Naive baseline:
+Compared to the naive baseline:
 
 ≈ 71% reduction in prediction error
 
-This shows that attention-based models capture temporal patterns more effectively than traditional methods.
+This demonstrates that attention-based architectures can better capture temporal dependencies in time-series data.
 
 📊 Dashboard Features
 
-The Streamlit dashboard provides interactive visualizations.
+The Streamlit dashboard provides interactive model analysis.
 
-Features include:
+Key features:
 
 Model Comparison
 
-Compare RMSE values across models.
+Visual comparison of RMSE values across models.
 
 Forecast Visualization
 
-Shows predicted vs actual electricity production.
+Graph showing predicted vs actual electricity production.
 
 Residual Analysis
 
-Analyzes prediction errors to evaluate model bias.
+Analysis of prediction errors to identify bias and variance.
 
 Parameter Exploration
 
@@ -310,14 +313,14 @@ models/
 main.py
 requirements.txt
 README.md
-🚀 How to Run the Project
-Install dependencies
+🚀 Running the Project
+1. Install dependencies
 pip install -r requirements.txt
-Run experiments
+2. Run experiments
 python experiments/run_experiments.py
-Launch dashboard
+3. Launch the dashboard
 streamlit run app/streamlit_app.py
-📚 Technologies Used
+🛠 Technologies Used
 
 Python
 
@@ -339,14 +342,14 @@ Statsmodels
 
 This project demonstrates:
 
-time-series preprocessing techniques
+time-series preprocessing
 
 sliding window forecasting
 
 classical vs deep learning model comparison
 
-transformer architectures for time series
+transformer architecture for time-series prediction
 
 experiment automation
 
-ML visualization dashboards
+interactive ML dashboards
