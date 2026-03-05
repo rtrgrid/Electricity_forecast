@@ -1,207 +1,170 @@
-# ⚡ Electricity Forecasting using ARIMA, LSTM, and Transformer
+# ⚡ Electricity Forecasting with ARIMA, LSTM, and Transformer
 
-An end-to-end **time-series forecasting project** that predicts
-electricity production using classical statistical models and modern
-deep learning architectures.
+This project builds and compares multiple **time-series forecasting
+models** to predict electricity production.\
+The goal is to evaluate how traditional statistical models compare with
+modern deep learning models.
 
-The project compares multiple forecasting approaches and demonstrates
-how **Transformer models outperform traditional models** for sequential
-time-series prediction.
+An interactive dashboard is provided using **Streamlit** to visualize
+predictions and model performance.
 
 ------------------------------------------------------------------------
 
-# 🌐 Live Streamlit Dashboard
+# 🌐 Live Dashboard
 
-Explore the interactive dashboard here:
-
-**Streamlit App:**\
+Streamlit App:\
 https://electricityforecast-cwdb6vgjhljudsnxn5z9kn.streamlit.app/
 
 The dashboard allows users to:
 
--   Compare forecasting models
--   Change experiment parameters
--   Visualize predictions
--   Analyze model errors
--   Understand model performance
+-   Compare model performance
+-   Visualize predictions vs actual values
+-   Explore forecasting parameters
+-   Analyze residual errors
 
 ------------------------------------------------------------------------
 
-# 📊 Project Overview
+# 📊 Problem Statement
 
-Electricity production forecasting is an important **time-series
-prediction problem** used in:
+Electricity production follows **time-dependent patterns** such as
+trends and seasonality.
 
--   Energy grid management\
--   Demand forecasting\
--   Infrastructure planning\
--   Resource allocation
+The objective of this project is to:
 
-This project compares **four forecasting approaches**:
-
-  Model            Type
-  ---------------- -------------------------------------
-  Naive Baseline   Simple heuristic
-  ARIMA            Statistical time-series model
-  LSTM             Recurrent neural network
-  Transformer      Attention-based deep learning model
-
-The goal is to determine **which architecture best captures temporal
-patterns in electricity production data**.
+1.  Train multiple forecasting models on electricity production data\
+2.  Compare their prediction accuracy\
+3.  Visualize model predictions and performance
 
 ------------------------------------------------------------------------
 
 # 📁 Dataset
 
-Dataset used: **Electric Production Dataset**
+Dataset: **Electric Production Dataset**
 
-The dataset contains **monthly electricity production values**.
+It contains monthly electricity production values.
 
   Column   Description
   -------- ------------------------------
   Date     Timestamp
   Value    Electricity production index
 
-Dataset size:
+Total observations:
 
 397 time steps
-
-The data contains clear **seasonal patterns and trends**, making it
-ideal for forecasting experiments.
 
 ------------------------------------------------------------------------
 
 # 🧠 Models Implemented
 
-## 1. Naive Baseline
+## Naive Baseline
 
-The Naive model predicts the **last observed value**.
+The naive model predicts future values using the **last observed
+value**.
 
-Prediction = Last Observed Value
+Prediction = Last value in the time series
 
-Purpose:
-
--   Establishes a baseline performance
--   Helps determine if complex models improve predictions
+This model acts as a **baseline benchmark**.
 
 ------------------------------------------------------------------------
 
-## 2. ARIMA Model
+## ARIMA
 
-ARIMA stands for:
+ARIMA stands for **AutoRegressive Integrated Moving Average**.
 
-AutoRegressive Integrated Moving Average
+It models the time series using:
 
-It models time series using three components:
+-   past values
+-   differencing
+-   past forecast errors
 
--   AR (AutoRegressive) → relationship with past values\
--   I (Integrated) → differencing to remove trends\
--   MA (Moving Average) → relationship with past errors
-
-Advantages:
-
--   Works well on smaller datasets\
--   Interpretable statistical model\
--   Captures linear trends
-
-Limitations:
-
--   Cannot easily model nonlinear patterns
+ARIMA works well when the data has **clear linear patterns and
+seasonality**.
 
 ------------------------------------------------------------------------
 
-## 3. LSTM Model
+## LSTM
 
-LSTM (**Long Short-Term Memory**) is a type of **Recurrent Neural
-Network (RNN)** designed for sequential data.
+LSTM (Long Short-Term Memory) is a **recurrent neural network designed
+for sequence data**.
 
-It contains three gates:
+It learns patterns from previous time steps and captures:
 
--   Forget Gate
--   Input Gate
--   Output Gate
-
-These gates allow the model to:
-
--   remember important past information
--   forget irrelevant information
--   maintain long-term dependencies
-
-Advantages:
-
--   Captures nonlinear relationships
--   Learns temporal patterns
--   Handles sequential data well
-
-Limitations:
-
--   Sequential computation slows training
+-   nonlinear relationships
+-   temporal dependencies
+-   long-term patterns
 
 ------------------------------------------------------------------------
 
-## 4. Transformer Model
+## Transformer
 
-Transformers use **self-attention mechanisms** to model relationships
+Transformers use a **self-attention mechanism** to model relationships
 between time steps.
 
-Instead of processing sequences step-by-step like RNNs, transformers
-analyze **relationships between all time steps simultaneously**.
+Unlike LSTM, transformers analyze **all time steps simultaneously**
+instead of sequentially.
 
-Advantages:
-
--   Captures global temporal dependencies
--   Highly parallelizable
--   Excellent performance on sequential data
-
-Transformers are widely used in:
-
--   GPT models
--   BERT
--   Vision Transformers
--   Time-series forecasting
+This allows the model to capture **global temporal patterns more
+effectively**.
 
 ------------------------------------------------------------------------
 
-# ⚙️ Forecasting Method
+# ⚙️ Forecasting Approach
 
-The project uses a **sliding window forecasting approach**.
+The project uses a **sliding window forecasting technique**.
 
-Example configuration:
+Example:
 
 Context Length = 24\
 Prediction Horizon = 12
 
 Meaning:
 
-Past 24 time steps → used to predict next 12 time steps
+Past 24 time steps → used to predict the next 12 steps
 
 Pipeline:
 
-Time Series → Sliding Window Creation → Model Training → Prediction →
+Raw Time Series\
+↓\
+Train/Test Split\
+↓\
+Scaling\
+↓\
+Sliding Window Creation\
+↓\
+Model Training\
+↓\
+Prediction\
+↓\
 Evaluation
 
 ------------------------------------------------------------------------
 
 # 📈 Evaluation Metric
 
-The models are evaluated using **RMSE (Root Mean Square Error)**.
+Model performance is measured using **RMSE (Root Mean Square Error)**.
 
-RMSE = sqrt((1/n) \* Σ(actual − predicted)²)
+RMSE = sqrt(mean((actual − predicted)\^2))
 
-Lower RMSE indicates **better forecasting performance**.
+RMSE represents the **average prediction error magnitude**.
+
+Lower RMSE means predictions are **closer to the true values**.
 
 ------------------------------------------------------------------------
 
-# 📊 Final Model Performance
+# 🧪 Experiment Setup
 
-Best experiment configuration:
+Training configuration used in the main experiment:
 
-Context Length: 24\
-Prediction Horizon: 12\
-Epochs: 50\
-Batch Size: 32
+Context Length : 24\
+Prediction Horizon : 12\
+Epochs : 50\
+Batch Size : 32
 
-Results:
+Models were trained using **mini-batch gradient descent**.
+
+------------------------------------------------------------------------
+
+# 📊 Final Results
 
   Model         RMSE
   ------------- ----------
@@ -212,66 +175,93 @@ Results:
 
 ------------------------------------------------------------------------
 
-# 🏆 Key Result
+# 🏆 Key Findings
 
-The **Transformer model achieved the lowest RMSE**, making it the best
-performing model.
+-   The **Naive model performs poorly** because it does not learn
+    patterns.
+-   **ARIMA improves performance** by modeling linear temporal
+    relationships.
+-   **LSTM performs better** by learning nonlinear sequence patterns.
+-   **Transformer achieves the best performance** by capturing global
+    temporal dependencies using attention.
 
-Compared to the naive baseline:
+------------------------------------------------------------------------
 
-≈ 71% reduction in prediction error
+# 📊 Dashboard Features
+
+The Streamlit dashboard provides:
+
+### Model Comparison
+
+Displays RMSE values for each model.
+
+### Forecast Visualization
+
+Shows predicted vs actual electricity production.
+
+### Residual Analysis
+
+Analyzes prediction errors.
+
+### Interactive Controls
+
+Users can modify:
+
+-   context length
+-   prediction horizon
+-   training epochs
 
 ------------------------------------------------------------------------
 
 # 🗂 Project Structure
 
-    electricity-forecasting/
+electricity-forecasting/
 
-    data/
-       Electric_Production.csv
+data/\
+  Electric_Production.csv
 
-    src/
-       data_loader.py
-       preprocessing.py
-       windows.py
-       lstm_model.py
-       transformer_model.py
-       arima_model.py
+src/\
+  data_loader.py\
+  preprocessing.py\
+  windows.py\
+  arima_model.py\
+  lstm_model.py\
+  transformer_model.py
 
-    experiments/
-       run_experiments.py
+experiments/\
+  run_experiments.py
 
-    app/
-       streamlit_app.py
+app/\
+  streamlit_app.py
 
-    outputs/
-       experiment_results.csv
-       model_results.csv
+outputs/\
+  experiment_results.csv\
+  model_results.csv
 
-    plots/
-       rmse_comparison.png
+plots/\
+  rmse_comparison.png
 
-    models/
-       lstm_model.pth
-       transformer_model.pth
+models/\
+  lstm_model.pth\
+  transformer_model.pth
 
-    main.py
-    requirements.txt
-    README.md
+main.py\
+requirements.txt\
+README.md
 
 ------------------------------------------------------------------------
 
-# 🚀 Running the Project
+# 🚀 How to Run the Project
 
 ## Install dependencies
 
 pip install -r requirements.txt
 
-## Run experiments
+## Train models
 
-python experiments/run_experiments.py
+python main.py
 
-## Launch Streamlit dashboard
+## Run Streamlit dashboard
 
 streamlit run app/streamlit_app.py
 
@@ -279,15 +269,14 @@ streamlit run app/streamlit_app.py
 
 # 🛠 Technologies Used
 
--   Python
--   PyTorch
--   Streamlit
--   NumPy
--   Pandas
--   Matplotlib
--   Scikit-learn
+-   Python\
+-   PyTorch\
+-   Streamlit\
+-   Pandas\
+-   NumPy\
+-   Matplotlib\
+-   Scikit-learn\
 -   Statsmodels
 
 ------------------------------------------------------------------------
-
 
