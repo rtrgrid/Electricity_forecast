@@ -27,6 +27,25 @@ The dashboard allows users to:
 
 ------------------------------------------------------------------------
 
+#📄 Project Report
+
+A detailed visual report of the project:
+
+**Project Report**\:
+https://enchanting-griffin-de872f.netlify.app/
+
+The report includes:
+
+-Detailed project explanation
+
+-Model architecture descriptions
+
+-Experiment methodology
+
+-Performance analysis
+
+-Visualization of forecasting results
+
 # 📊 Project Overview
 
 Electricity production forecasting is an important **time-series
