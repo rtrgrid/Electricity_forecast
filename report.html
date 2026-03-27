@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Electricity Forecasting Report</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+font-family:'Poppins',sans-serif;
+margin:0;
+background:#f4f7fc;
+color:#333;
+line-height:1.6;
+}
+
+header{
+background:linear-gradient(120deg,#2563eb,#1e40af);
+color:white;
+padding:60px;
+text-align:center;
+}
+
+header h1{
+font-size:42px;
+margin-bottom:10px;
+}
+
+.container{
+width:85%;
+margin:auto;
+padding:40px 0;
+}
+
+.section{
+background:white;
+padding:35px;
+border-radius:10px;
+margin-bottom:30px;
+box-shadow:0px 5px 15px rgba(0,0,0,0.08);
+}
+
+.section h2{
+border-left:6px solid #2563eb;
+padding-left:12px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #eee;
+text-align:center;
+}
+
+th{
+background:#2563eb;
+color:white;
+}
+
+.model-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.model{
+padding:20px;
+border-radius:8px;
+background:#eef2ff;
+text-align:center;
+}
+
+.graph img{
+width:70%;
+border-radius:8px;
+}
+
+.btn{
+display:inline-block;
+padding:12px 20px;
+background:#2563eb;
+color:white;
+border-radius:5px;
+text-decoration:none;
+}
+
+footer{
+text-align:center;
+padding:25px;
+color:#666;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>Electricity Forecasting using ARIMA, LSTM and Transformer</h1>
+<p>Machine Learning Time Series Forecasting Project</p>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="section">
+
+<h2>1. Introduction</h2>
+
+<p>
+Electricity demand forecasting plays an important role in energy planning and power grid management.
+Accurate predictions help utility providers optimize generation, reduce operational costs,
+and ensure stable power distribution.
+</p>
+
+<p>
+Traditional forecasting techniques such as ARIMA have been widely used for time series prediction.
+However, modern deep learning models like LSTM and Transformer architectures have demonstrated
+strong performance in capturing complex sequential patterns.
+</p>
+
+<p>
+In this project we compare classical statistical methods with deep learning models
+to evaluate which approach produces the most accurate electricity production forecasts.
+</p>
+
+</div>
+
+
+<div class="section">
+
+<h2>2. Dataset</h2>
+
+<p>
+The dataset used in this project is the Electricity Production dataset.
+It contains historical monthly electricity generation values over several years.
+</p>
+
+<table>
+
+<tr>
+<th>Column</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>Date</td>
+<td>Timestamp of electricity production</td>
+</tr>
+
+<tr>
+<td>Value</td>
+<td>Electricity production index</td>
+</tr>
+
+</table>
+
+<p>
+The dataset exhibits seasonal patterns and long-term trends, making it suitable
+for evaluating time-series forecasting models.
+</p>
+
+</div>
+
+
+<div class="section">
+
+<h2>3. Project Pipeline</h2>
+
+<p>The forecasting pipeline used in this project consists of the following stages:</p>
+
+<ol>
+
+<li>Data Loading</li>
+<li>Train-Test Split</li>
+<li>Data Scaling</li>
+<li>Sliding Window Creation</li>
+<li>Model Training</li>
+<li>Prediction Generation</li>
+<li>Evaluation using RMSE</li>
+
+</ol>
+
+<p>
+Sliding window forecasting converts time-series data into supervised learning samples.
+For example, if the context window is 24 months and the prediction horizon is 12 months,
+the model learns to predict the next 12 months using the previous 24 months of data.
+</p>
+
+</div>
+
+
+<div class="section">
+
+<h2>4. Models Implemented</h2>
+
+<div class="model-grid">
+
+<div class="model">
+
+<h3>Naive Baseline</h3>
+
+<p>
+The naive baseline predicts the future value using the last observed value.
+This provides a benchmark to evaluate the effectiveness of more advanced models.
+</p>
+
+</div>
+
+<div class="model">
+
+<h3>ARIMA</h3>
+
+<p>
+ARIMA (AutoRegressive Integrated Moving Average) is a statistical model
+that captures linear relationships in time-series data using past values
+and error terms.
+</p>
+
+</div>
+
+<div class="model">
+
+<h3>LSTM</h3>
+
+<p>
+LSTM (Long Short-Term Memory) networks are recurrent neural networks designed
+to capture long-term dependencies in sequential data using memory cells
+and gating mechanisms.
+</p>
+
+</div>
+
+<div class="model">
+
+<h3>Transformer</h3>
+
+<p>
+Transformer models use attention mechanisms to learn relationships between
+different time steps in the sequence. This allows them to capture long-range
+temporal dependencies effectively.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="section">
+
+<h2>5. Experiment Configuration</h2>
+
+<table>
+
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+
+<tr>
+<td>Context Length</td>
+<td>24</td>
+</tr>
+
+<tr>
+<td>Prediction Horizon</td>
+<td>12</td>
+</tr>
+
+<tr>
+<td>Epochs</td>
+<td>50</td>
+</tr>
+
+<tr>
+<td>Batch Size</td>
+<td>32</td>
+</tr>
+
+</table>
+
+<p>
+Mini-batch gradient descent was used during training to stabilize learning and improve convergence.
+</p>
+
+</div>
+
+
+<div class="section">
+
+<h2>6. Evaluation Metric</h2>
+
+<p>
+Model performance is evaluated using Root Mean Square Error (RMSE).
+</p>
+
+<p>
+RMSE measures the average magnitude of prediction errors and is defined as:
+</p>
+
+<p><b>RMSE = √( mean( (actual − predicted)² ) )</b></p>
+
+<p>
+Lower RMSE values indicate better model performance.
+</p>
+
+</div>
+
+
+<div class="section">
+
+<h2>7. Results</h2>
+
+<table>
+
+<tr>
+<th>Model</th>
+<th>RMSE</th>
+</tr>
+
+<tr>
+<td>Naive</td>
+<td>13.02</td>
+</tr>
+
+<tr>
+<td>ARIMA</td>
+<td>5.16</td>
+</tr>
+
+<tr>
+<td>LSTM</td>
+<td>4.15</td>
+</tr>
+
+<tr>
+<td><b>Transformer</b></td>
+<td><b>3.81</b></td>
+</tr>
+
+</table>
+
+<p>
+The Transformer model achieved the lowest RMSE and produced the most accurate predictions.
+</p>
+
+</div>
+
+
+<div class="section graph">
+
+<h2>8. Visualization</h2>
+
+<p>
+The following graph shows the comparison of RMSE values across different models.
+</p>
+
+<img src="plots/rmse_comparison.png">
+
+</div>
+
+
+<div class="section">
+
+<h2>9. Interactive Dashboard</h2>
+
+<p>
+An interactive dashboard was built using Streamlit to visualize predictions
+and compare model performance dynamically.
+</p>
+
+<p>
+Users can adjust parameters such as context length, prediction horizon,
+and training epochs to observe how these changes affect model performance.
+</p>
+
+<a class="btn" href="https://electricityforecast-cwdb6vgjhljudsnxn5z9kn.streamlit.app/" target="_blank">
+Open Streamlit Dashboard
+</a>
+
+</div>
+
+
+<div class="section">
+
+<h2>10. Future Work</h2>
+
+<ul>
+
+<li>Experiment with larger electricity datasets</li>
+<li>Implement advanced models such as Temporal Fusion Transformer</li>
+<li>Add probabilistic forecasting and uncertainty estimation</li>
+<li>Deploy model inference with pre-trained weights for faster dashboards</li>
+
+</ul>
+
+</div>
+
+
+<div class="section">
+
+<h2>11. Technologies Used</h2>
+
+<ul>
+
+<li>Python</li>
+<li>PyTorch</li>
+<li>Streamlit</li>
+<li>Pandas</li>
+<li>NumPy</li>
+<li>Matplotlib</li>
+<li>Scikit-learn</li>
+
+</ul>
+
+</div>
+
+
+<div class="section">
+
+<h2>12. Conclusion</h2>
+
+<p>
+This project demonstrates the effectiveness of deep learning methods for time-series forecasting.
+Among the models tested, the Transformer architecture achieved the best performance
+by effectively capturing long-range temporal dependencies.
+</p>
+
+</div>
+
+
+</div>
+
+<footer>
+
+<p>Electricity Forecasting Project | Rohith T R</p>
+
+</footer>
+
+</body>
+</html>
